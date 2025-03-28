@@ -39,8 +39,8 @@ class BottomNavigation extends StatelessWidget {
               );
 
               if (shouldLogout == true) {
-                await UserRepositoryImpl().logoutUser();  // Виклик розлогінювання
-                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);  // Повернути на сторінку логіну
+                await UserRepositoryImpl().logoutUser();
+                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
               }
             },
             child: Image.asset(

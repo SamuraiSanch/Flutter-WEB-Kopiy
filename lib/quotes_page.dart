@@ -5,14 +5,12 @@ import 'package:http/http.dart' as http;
 class QuotesPage extends StatelessWidget {
   const QuotesPage({Key? key}) : super(key: key);
 
-  Future<Map<String, String>> fetchQuotes() async {
-    const String apiKey = 'arZdrqzOset8cL8nvWeriQ==TamyKn402MsA2nf4';
-    final categories = ['happiness', 'amazing', 'family', 'money', 'love'];
+  Future<List<Map<String, String>>> fetchQuotes(int count) async {
+    const String apiKey = 'TMsrbPJ3GVATdGy1OtX8jA==j9KvxSvsF4VnIhix';
+    List<Map<String, String>> quotes = [];
 
-    Map<String, String> quotes = {};
-
-    for (var category in categories) {
-      final apiUrl = 'https://api.api-ninjas.com/v1/quotes?category=$category';
+    for (int i = 0; i < count; i++) {
+      final apiUrl = 'https://api.api-ninjas.com/v1/quotes';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: {'X-Api-Key': apiKey},
@@ -20,10 +18,15 @@ class QuotesPage extends StatelessWidget {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        // Додаємо цитату для кожної категорії
-        quotes[category] = data[0]['quote'].toString();
+        quotes.add({
+          'category': data[0]['category'].toString(),
+          'quote': data[0]['quote'].toString(),
+        });
       } else {
-        quotes[category] = 'Failed to load quote for $category';
+        quotes.add({
+          'category': 'unknown',
+          'quote': 'Failed to load quote',
+        });
       }
     }
 
@@ -36,8 +39,8 @@ class QuotesPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Inspiration Quotes'),
       ),
-      body: FutureBuilder<Map<String, String>>(
-        future: fetchQuotes(),
+      body: FutureBuilder<List<Map<String, String>>>(
+        future: fetchQuotes(5), // Отримуємо 5 випадкових цитат
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -48,8 +51,8 @@ class QuotesPage extends StatelessWidget {
             return ListView.builder(
               itemCount: quotes.length,
               itemBuilder: (context, index) {
-                final category = quotes.keys.elementAt(index);
-                final quote = quotes[category];
+                final category = quotes[index]['category'] ?? 'unknown';
+                final quote = quotes[index]['quote'] ?? 'No quote available';
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
